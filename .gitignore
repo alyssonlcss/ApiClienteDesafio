@@ -1,0 +1,80 @@
+# Build results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+.vs/
+
+# Rider
+.idea/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# DotNet CLI
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Entity Framework
+#Migrations/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+*.nuspec
+*.psmdcp
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Others
+*.dbmdl
+*.db
+*.bak
+*.mdf
+*.ldf
+
+# Publish
+publish/
+*.Publish.xml
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Local secrets
+secrets.json
+
+# Rider
+.idea/
+*.sln.iml
+
+# Windows image file caches
+*.jfif
+
+# Backup & temp files
+*~
+*.tmp
+*.temp
