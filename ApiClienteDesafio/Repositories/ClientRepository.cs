@@ -11,24 +11,24 @@ namespace ApiClienteDesafio.Repositories
 
         public List<ClientModel> GetAll() => clients;
 
-        public ClientModel GetById(int id) => clients.FirstOrDefault(c => c.Id == id);
+        public ClientModel GetById(int clientId) => clients.FirstOrDefault(c => c.ClientId == clientId);
 
         public void Add(ClientModel client)
         {
-            client.Id = nextId++;
+            client.ClientId = nextId++;
             clients.Add(client);
         }
 
         public void Update(ClientModel client)
         {
-            var index = clients.FindIndex(c => c.Id == client.Id);
+            var index = clients.FindIndex(c => c.ClientId == client.ClientId);
             if (index != -1)
                 clients[index] = client;
         }
 
-        public void Delete(int id)
+        public void Delete(int clientId)
         {
-            var client = GetById(id);
+            var client = GetById(clientId);
             if (client != null)
                 clients.Remove(client);
         }

@@ -5,13 +5,12 @@ namespace ApiClienteDesafio.Models
 {
     public class ClientModel
     {
-        public int Id { get; set; }
+        public int ClientId { get; set; }
         public string Name { get; set; }
         public string Cpf { get; set; }
         public DateTime BirthDate { get; set; }
         public string Email { get; set; }
-
-        public ICollection<AddressModel> Addresses { get; set; }
-        public ICollection<ContactModel> Contacts { get; set; }
+        public AddressModel Address { get; set; }
+        public ContactModel Contact { get; set; } 
     }
 }

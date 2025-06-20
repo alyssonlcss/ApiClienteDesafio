@@ -18,18 +18,24 @@ namespace ApiClienteDesafio.Services
             _httpClient = httpClientFactory.CreateClient();
         }
 
-        public async Task<List<AddressModel>> GetByClientIdAsync(int clientId)
+        public async Task<AddressModel> GetByClientIdAsync(int clientId)
         {
-            return await _context.Addresses.Where(a => a.ClientId == clientId).ToListAsync();
+            return await _context.Addresses.FirstOrDefaultAsync(a => a.ClientId == clientId);
         }
 
-        public async Task<AddressModel> GetByIdAsync(int id)
+        public async Task<(AddressModel address, string error)> AddAsync(int clientId, AddressModel address)
         {
-            return await _context.Addresses.FindAsync(id);
-        }
+            // Verifica se já existe Address para este ClientId
+            var exists = await _context.Addresses.AnyAsync(a => a.ClientId == clientId);
+            if (exists)
+                return (null, "A client can only have one address.");
 
-        public async Task<(AddressModel address, string error)> AddAsync(AddressModel address)
-        {
+            // Verifica se o Client existe
+            var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == clientId);
+            if (!clientExists)
+                return (null, "ClientId does not exist.");
+
+            address.ClientId = clientId;
             var (success, error) = await FillAddressFromViaCep(address.ZipCode, address);
             if (!success)
                 return (null, error);
@@ -39,8 +45,14 @@ namespace ApiClienteDesafio.Services
             return (address, null);
         }
 
-        public async Task<(bool success, string error)> UpdateAsync(AddressModel address)
+        public async Task<(bool success, string error)> UpdateByClientIdAsync(int clientId, AddressModel address)
         {
+            var existing = await _context.Addresses.FirstOrDefaultAsync(a => a.ClientId == clientId);
+            if (existing == null)
+                return (false, "Address not found for this client.");
+
+            address.AddressId = existing.AddressId;
+            address.ClientId = clientId;
             var (success, error) = await FillAddressFromViaCep(address.ZipCode, address);
             if (!success)
                 return (false, error);
@@ -65,9 +77,9 @@ namespace ApiClienteDesafio.Services
             return (true, null);
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteByClientIdAsync(int clientId)
         {
-            var address = await _context.Addresses.FindAsync(id);
+            var address = await _context.Addresses.FirstOrDefaultAsync(a => a.ClientId == clientId);
             if (address != null)
             {
                 _context.Addresses.Remove(address);

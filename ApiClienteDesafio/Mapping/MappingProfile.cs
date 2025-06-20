@@ -9,8 +9,12 @@ namespace ApiClienteDesafio.Mapping
         public MappingProfile()
         {
             CreateMap<ClientModel, ClientDTO>().ReverseMap();
+            CreateMap<ClientModel, ClientDetailDTO>();
+            CreateMap<ClientCreateDTO, ClientModel>();
             CreateMap<AddressModel, AddressDTO>().ReverseMap();
+            CreateMap<AddressCreateDTO, AddressModel>();
             CreateMap<ContactModel, ContactDTO>().ReverseMap();
+            CreateMap<ContactCreateDTO, ContactModel>();
         }
     }
 }

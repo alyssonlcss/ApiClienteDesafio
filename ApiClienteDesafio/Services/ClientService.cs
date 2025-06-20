@@ -18,17 +18,17 @@ namespace ApiClienteDesafio.Services
         public async Task<List<ClientModel>> GetAllAsync()
         {
             return await _context.Clients
-                .Include(c => c.Addresses)
-                .Include(c => c.Contacts)
+                .Include(c => c.Address)
+                .Include(c => c.Contact)
                 .ToListAsync();
         }
 
-        public async Task<ClientModel> GetByIdAsync(int id)
+        public async Task<ClientModel> GetByIdAsync(int clientId)
         {
             return await _context.Clients
-                .Include(c => c.Addresses)
-                .Include(c => c.Contacts)
-                .FirstOrDefaultAsync(c => c.Id == id);
+                .Include(c => c.Address)
+                .Include(c => c.Contact)
+                .FirstOrDefaultAsync(c => c.ClientId == clientId);
         }
 
         public async Task<ClientModel> AddAsync(ClientModel client)

@@ -11,26 +11,28 @@ namespace ApiClienteDesafio.Repositories
 
         public List<ContactModel> GetAll() => contacts;
 
-        public ContactModel GetById(int id) => contacts.FirstOrDefault(c => c.Id == id);
+        public ContactModel GetByClientId(int clientId) => contacts.FirstOrDefault(c => c.ClientId == clientId);
 
-        public List<ContactModel> GetByClientId(int clientId) => contacts.Where(c => c.ClientId == clientId).ToList();
-
-        public void Add(ContactModel contact)
+        public void Add(int clientId, ContactModel contact)
         {
-            contact.Id = nextId++;
+            // Só permite um Contact por ClientId
+            if (contacts.Any(c => c.ClientId == clientId))
+                return;
+            contact.ContactId = nextId++;
+            contact.ClientId = clientId;
             contacts.Add(contact);
         }
 
-        public void Update(ContactModel contact)
+        public void Update(int clientId, ContactModel contact)
         {
-            var index = contacts.FindIndex(c => c.Id == contact.Id);
+            var index = contacts.FindIndex(c => c.ClientId == clientId);
             if (index != -1)
                 contacts[index] = contact;
         }
 
-        public void Delete(int id)
+        public void Delete(int clientId)
         {
-            var contact = GetById(id);
+            var contact = GetByClientId(clientId);
             if (contact != null)
                 contacts.Remove(contact);
         }

@@ -11,26 +11,28 @@ namespace ApiClienteDesafio.Repositories
 
         public List<AddressModel> GetAll() => addresses;
 
-        public AddressModel GetById(int id) => addresses.FirstOrDefault(a => a.Id == id);
+        public AddressModel GetByClientId(int clientId) => addresses.FirstOrDefault(a => a.ClientId == clientId);
 
-        public List<AddressModel> GetByClientId(int clientId) => addresses.Where(a => a.ClientId == clientId).ToList();
-
-        public void Add(AddressModel address)
+        public void Add(int clientId, AddressModel address)
         {
-            address.Id = nextId++;
+            // Só permite um Address por ClientId
+            if (addresses.Any(a => a.ClientId == clientId))
+                return;
+            address.AddressId = nextId++;
+            address.ClientId = clientId;
             addresses.Add(address);
         }
 
-        public void Update(AddressModel address)
+        public void Update(int clientId, AddressModel address)
         {
-            var index = addresses.FindIndex(a => a.Id == address.Id);
+            var index = addresses.FindIndex(a => a.ClientId == clientId);
             if (index != -1)
                 addresses[index] = address;
         }
 
-        public void Delete(int id)
+        public void Delete(int clientId)
         {
-            var address = GetById(id);
+            var address = GetByClientId(clientId);
             if (address != null)
                 addresses.Remove(address);
         }

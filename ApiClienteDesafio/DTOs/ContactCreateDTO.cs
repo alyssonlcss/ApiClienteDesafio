@@ -1,8 +1,7 @@
 namespace ApiClienteDesafio.DTOs
 {
-    public class ContactDTO
+    public class ContactCreateDTO
     {
-        public int ContactId { get; set; }
         public string Number { get; set; }
         public string Type { get; set; }
         public int ClientId { get; set; }

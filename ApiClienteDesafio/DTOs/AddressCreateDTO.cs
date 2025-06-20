@@ -1,8 +1,7 @@
 namespace ApiClienteDesafio.DTOs
 {
-    public class AddressDTO
+    public class AddressCreateDTO
     {
-        public int AddressId { get; set; }
         public string Street { get; set; }
         public string Number { get; set; }
         public string Neighborhood { get; set; }

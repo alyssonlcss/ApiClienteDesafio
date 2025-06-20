@@ -24,20 +24,17 @@ namespace ApiClienteDesafio.Migrations
 
             modelBuilder.Entity("ApiClienteDesafio.Models.AddressModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("AddressId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AddressId"));
 
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ClientModelId")
                         .HasColumnType("int");
 
                     b.Property<string>("Neighborhood")
@@ -60,20 +57,21 @@ namespace ApiClienteDesafio.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("AddressId");
 
-                    b.HasIndex("ClientModelId");
+                    b.HasIndex("ClientId")
+                        .IsUnique();
 
                     b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("ApiClienteDesafio.Models.ClientModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ClientId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClientId"));
 
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
@@ -90,23 +88,20 @@ namespace ApiClienteDesafio.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("ClientId");
 
                     b.ToTable("Clients");
                 });
 
             modelBuilder.Entity("ApiClienteDesafio.Models.ContactModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ContactId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ContactId"));
 
                     b.Property<int>("ClientId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ClientModelId")
                         .HasColumnType("int");
 
                     b.Property<string>("Number")
@@ -117,32 +112,43 @@ namespace ApiClienteDesafio.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("ContactId");
 
-                    b.HasIndex("ClientModelId");
+                    b.HasIndex("ClientId")
+                        .IsUnique();
 
                     b.ToTable("Contacts");
                 });
 
             modelBuilder.Entity("ApiClienteDesafio.Models.AddressModel", b =>
                 {
-                    b.HasOne("ApiClienteDesafio.Models.ClientModel", null)
-                        .WithMany("Addresses")
-                        .HasForeignKey("ClientModelId");
+                    b.HasOne("ApiClienteDesafio.Models.ClientModel", "Client")
+                        .WithOne("Address")
+                        .HasForeignKey("ApiClienteDesafio.Models.AddressModel", "ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("ApiClienteDesafio.Models.ContactModel", b =>
                 {
-                    b.HasOne("ApiClienteDesafio.Models.ClientModel", null)
-                        .WithMany("Contacts")
-                        .HasForeignKey("ClientModelId");
+                    b.HasOne("ApiClienteDesafio.Models.ClientModel", "Client")
+                        .WithOne("Contact")
+                        .HasForeignKey("ApiClienteDesafio.Models.ContactModel", "ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("ApiClienteDesafio.Models.ClientModel", b =>
                 {
-                    b.Navigation("Addresses");
+                    b.Navigation("Address")
+                        .IsRequired();
 
-                    b.Navigation("Contacts");
+                    b.Navigation("Contact")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

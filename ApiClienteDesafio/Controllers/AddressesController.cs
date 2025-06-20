@@ -4,13 +4,12 @@ using ApiClienteDesafio.DTOs;
 using ApiClienteDesafio.Services;
 using ApiClienteDesafio.Validators;
 using AutoMapper;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ApiClienteDesafio.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/clients/{clientId}/address")]
     public class AddressesController : ControllerBase
     {
         private readonly AddressService _addressService;
@@ -22,57 +21,38 @@ namespace ApiClienteDesafio.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("client/{clientId}")]
+        [HttpGet]
         public async Task<IActionResult> GetByClientId(int clientId)
         {
-            var addresses = await _addressService.GetByClientIdAsync(clientId);
-            var addressesDto = _mapper.Map<List<AddressDTO>>(addresses);
-            return Ok(addressesDto);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var address = await _addressService.GetByIdAsync(id);
+            var address = await _addressService.GetByClientIdAsync(clientId);
             if (address == null) return NotFound();
             var addressDto = _mapper.Map<AddressDTO>(address);
             return Ok(addressDto);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] AddressDTO addressDto)
+        public async Task<IActionResult> Create(int clientId, [FromBody] AddressCreateDTO addressDto)
         {
             var address = _mapper.Map<AddressModel>(addressDto);
-            if (!AddressValidator.IsValid(address, out var error))
-                return BadRequest(error);
-
-            var (created, viaCepError) = await _addressService.AddAsync(address);
-            if (viaCepError != null)
-                return BadRequest(viaCepError);
-
+            var (created, error) = await _addressService.AddAsync(clientId, address);
+            if (error != null) return BadRequest(error);
             var createdDto = _mapper.Map<AddressDTO>(created);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, createdDto);
+            return CreatedAtAction(nameof(GetByClientId), new { clientId }, createdDto);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] AddressDTO addressDto)
+        [HttpPut]
+        public async Task<IActionResult> Update(int clientId, [FromBody] AddressDTO addressDto)
         {
             var address = _mapper.Map<AddressModel>(addressDto);
-            address.Id = id;
-            if (!AddressValidator.IsValid(address, out var error))
-                return BadRequest(error);
-
-            var (success, viaCepError) = await _addressService.UpdateAsync(address);
-            if (!success)
-                return BadRequest(viaCepError);
-
+            var (success, error) = await _addressService.UpdateByClientIdAsync(clientId, address);
+            if (!success) return BadRequest(error);
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int clientId)
         {
-            await _addressService.DeleteAsync(id);
+            await _addressService.DeleteByClientIdAsync(clientId);
             return NoContent();
         }
     }
