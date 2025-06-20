@@ -37,6 +37,10 @@ namespace ApiClienteDesafio.Migrations
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Complement")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Neighborhood")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -73,16 +77,8 @@ namespace ApiClienteDesafio.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClientId"));
 
-                    b.Property<DateTime>("BirthDate")
+                    b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Cpf")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -103,6 +99,10 @@ namespace ApiClienteDesafio.Migrations
 
                     b.Property<int>("ClientId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Number")
                         .IsRequired()

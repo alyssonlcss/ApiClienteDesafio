@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using ApiClienteDesafio.Models;
 using ApiClienteDesafio.DTOs;
 using ApiClienteDesafio.Services;
-using ApiClienteDesafio.Validators;
 using AutoMapper;
 using System.Threading.Tasks;
+using ApiClienteDesafio.Utils;
 
 namespace ApiClienteDesafio.Controllers
 {
@@ -34,6 +34,8 @@ namespace ApiClienteDesafio.Controllers
         public async Task<IActionResult> Create([FromBody] ContactCreateDTO contactDTO)
         {
             var contact = _mapper.Map<ContactModel>(contactDTO);
+            if (!ValidationUtils.TryValidateObject(contact, out var validationResults))
+                return BadRequest(string.Join("; ", validationResults.Select(v => v.ErrorMessage)));
             var created = await _contactService.AddAsync(contact);
             if (created == null) return BadRequest("A client can only have one contact or ClientId does not exist.");
             var createdDto = _mapper.Map<ContactDTO>(created);
@@ -44,6 +46,8 @@ namespace ApiClienteDesafio.Controllers
         public async Task<IActionResult> Update([FromBody] ContactCreateDTO contactDTO)
         {
             var contact = _mapper.Map<ContactModel>(contactDTO);
+            if (!ValidationUtils.TryValidateObject(contact, out var validationResults))
+                return BadRequest(string.Join("; ", validationResults.Select(v => v.ErrorMessage)));
             var success = await _contactService.UpdateByClientIdAsync(contact);
             if (!success) return BadRequest("Contact not found for this client or already exists another contact.");
             return NoContent();

@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using ApiClienteDesafio.Models;
 using ApiClienteDesafio.DTOs;
 using ApiClienteDesafio.Services;
-using ApiClienteDesafio.Validators;
 using AutoMapper;
 using System.Threading.Tasks;
+using ApiClienteDesafio.Utils;
 
 namespace ApiClienteDesafio.Controllers
 {
@@ -34,8 +34,10 @@ namespace ApiClienteDesafio.Controllers
         public async Task<IActionResult> Create([FromBody] AddressCreateDTO addressDTO)
         {
             var address = _mapper.Map<AddressModel>(addressDTO);
-            var (created, error) = await _addressService.AddAsync(address);
-            if (error != null) return BadRequest(error);
+            if (!ValidationUtils.TryValidateObject(address, out var validationResults))
+                return BadRequest(string.Join("; ", validationResults.Select(v => v.ErrorMessage)));
+            var (created, serviceError) = await _addressService.AddAsync(address);
+            if (serviceError != null) return BadRequest(serviceError);
             var createdDto = _mapper.Map<AddressDTO>(created);
             return CreatedAtAction(nameof(GetByClientId), new { clientId = address.ClientId }, createdDto);
         }
@@ -44,8 +46,10 @@ namespace ApiClienteDesafio.Controllers
         public async Task<IActionResult> Update([FromBody] AddressCreateDTO addressDTO)
         {
             var address = _mapper.Map<AddressModel>(addressDTO);
-            var (success, error) = await _addressService.UpdateByClientIdAsync(address);
-            if (!success) return BadRequest(error);
+            if (!ValidationUtils.TryValidateObject(address, out var validationResults))
+                return BadRequest(string.Join("; ", validationResults.Select(v => v.ErrorMessage)));
+            var (success, serviceError) = await _addressService.UpdateByClientIdAsync(address);
+            if (!success) return BadRequest(serviceError);
             return NoContent();
         }
 

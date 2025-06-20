@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using ApiClienteDesafio.Data;
 using AutoMapper;
 using ApiClienteDesafio.Mapping;
+using ApiClienteDesafio.Integration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,7 @@ builder.Services.AddScoped<ClientService>();
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<AddressService>();
 builder.Services.AddScoped<ContactService>();
+builder.Services.AddScoped<ViaCepIntegration>();
 
 var app = builder.Build();
 

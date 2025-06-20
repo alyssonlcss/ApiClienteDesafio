@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using ApiClienteDesafio.Models;
 using ApiClienteDesafio.DTOs;
 using ApiClienteDesafio.Services;
-using ApiClienteDesafio.Validators;
 using AutoMapper;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -43,9 +42,6 @@ namespace ApiClienteDesafio.Controllers
         public async Task<IActionResult> Create([FromBody] ClientCreateDTO clientDTO)
         {
             var client = _mapper.Map<ClientModel>(clientDTO);
-            if (!ClientValidator.IsValid(client, out var error))
-                return BadRequest(error);
-
             var created = await _clientService.AddAsync(client);
             var createdDto = _mapper.Map<ClientDTO>(created);
             return CreatedAtAction(nameof(GetById), new { clientId = created.ClientId }, createdDto);
@@ -55,10 +51,13 @@ namespace ApiClienteDesafio.Controllers
         public async Task<IActionResult> Update([FromBody] ClientDTO clientDTO)
         {
             var client = _mapper.Map<ClientModel>(clientDTO);
-            if (!ClientValidator.IsValid(client, out var error))
+            var (success, error) = await _clientService.UpdateAsync(client);
+            if (!success)
+            {
+                if (error == "ClientId does not exist.")
+                    return NotFound(error);
                 return BadRequest(error);
-
-            await _clientService.UpdateAsync(client);
+            }
             return NoContent();
         }
 
