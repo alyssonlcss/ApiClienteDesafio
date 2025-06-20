@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace ApiClienteDesafio.Controllers
 {
     [ApiController]
-    [Route("api/clients/{clientId}/address")]
+    [Route("addresses")]
     public class AddressesController : ControllerBase
     {
         private readonly AddressService _addressService;
@@ -21,7 +21,7 @@ namespace ApiClienteDesafio.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet("{clientId}")]
         public async Task<IActionResult> GetByClientId(int clientId)
         {
             var address = await _addressService.GetByClientIdAsync(clientId);
@@ -31,25 +31,25 @@ namespace ApiClienteDesafio.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(int clientId, [FromBody] AddressCreateDTO addressDto)
+        public async Task<IActionResult> Create([FromBody] AddressCreateDTO addressDTO)
         {
-            var address = _mapper.Map<AddressModel>(addressDto);
-            var (created, error) = await _addressService.AddAsync(clientId, address);
+            var address = _mapper.Map<AddressModel>(addressDTO);
+            var (created, error) = await _addressService.AddAsync(address);
             if (error != null) return BadRequest(error);
             var createdDto = _mapper.Map<AddressDTO>(created);
-            return CreatedAtAction(nameof(GetByClientId), new { clientId }, createdDto);
+            return CreatedAtAction(nameof(GetByClientId), new { clientId = address.ClientId }, createdDto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(int clientId, [FromBody] AddressDTO addressDto)
+        public async Task<IActionResult> Update([FromBody] AddressCreateDTO addressDTO)
         {
-            var address = _mapper.Map<AddressModel>(addressDto);
-            var (success, error) = await _addressService.UpdateByClientIdAsync(clientId, address);
+            var address = _mapper.Map<AddressModel>(addressDTO);
+            var (success, error) = await _addressService.UpdateByClientIdAsync(address);
             if (!success) return BadRequest(error);
             return NoContent();
         }
 
-        [HttpDelete]
+        [HttpDelete("{clientId}")]
         public async Task<IActionResult> Delete(int clientId)
         {
             await _addressService.DeleteByClientIdAsync(clientId);

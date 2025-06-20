@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ApiClienteDesafio.Services;
-using ApiClienteDesafio.Repositories;
 using Microsoft.EntityFrameworkCore;
 using ApiClienteDesafio.Data;
 using AutoMapper;

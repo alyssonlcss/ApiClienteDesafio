@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace ApiClienteDesafio.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("clients")]
     public class ClientsController : ControllerBase
     {
         private readonly ClientService _clientService;
@@ -22,7 +22,7 @@ namespace ApiClienteDesafio.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet("all-clients")]
         public async Task<IActionResult> GetAll()
         {
             var clients = await _clientService.GetAllAsync();
@@ -40,9 +40,9 @@ namespace ApiClienteDesafio.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ClientCreateDTO clientDto)
+        public async Task<IActionResult> Create([FromBody] ClientCreateDTO clientDTO)
         {
-            var client = _mapper.Map<ClientModel>(clientDto);
+            var client = _mapper.Map<ClientModel>(clientDTO);
             if (!ClientValidator.IsValid(client, out var error))
                 return BadRequest(error);
 
@@ -51,11 +51,10 @@ namespace ApiClienteDesafio.Controllers
             return CreatedAtAction(nameof(GetById), new { clientId = created.ClientId }, createdDto);
         }
 
-        [HttpPut("{clientId}")]
-        public async Task<IActionResult> Update(int clientId, [FromBody] ClientDTO clientDto)
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] ClientDTO clientDTO)
         {
-            var client = _mapper.Map<ClientModel>(clientDto);
-            client.ClientId = clientId;
+            var client = _mapper.Map<ClientModel>(clientDTO);
             if (!ClientValidator.IsValid(client, out var error))
                 return BadRequest(error);
 

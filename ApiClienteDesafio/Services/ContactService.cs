@@ -20,33 +20,29 @@ namespace ApiClienteDesafio.Services
             return await _context.Contacts.FirstOrDefaultAsync(c => c.ClientId == clientId);
         }
 
-        public async Task<ContactModel> AddAsync(int clientId, ContactModel contact)
+        public async Task<ContactModel> AddAsync(ContactModel contact)
         {
-            // Verifica se já existe Contact para este ClientId
-            var exists = await _context.Contacts.AnyAsync(c => c.ClientId == clientId);
+            var exists = await _context.Contacts.AnyAsync(c => c.ClientId == contact.ClientId);
             if (exists)
-                return null; // Ou retorne um erro, se preferir
-
-            // Verifica se o Client existe
-            var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == clientId);
+                return null; 
+            var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == contact.ClientId);
             if (!clientExists)
-                return null; // Ou retorne um erro, se preferir
+                return null; 
 
-            contact.ClientId = clientId;
             _context.Contacts.Add(contact);
             await _context.SaveChangesAsync();
             return contact;
         }
 
-        public async Task<bool> UpdateByClientIdAsync(int clientId, ContactModel contact)
+        public async Task<bool> UpdateByClientIdAsync(ContactModel contact)
         {
-            var existing = await _context.Contacts.FirstOrDefaultAsync(c => c.ClientId == clientId);
+            var existing = await _context.Contacts.FirstOrDefaultAsync(c => c.ClientId == contact.ClientId);
             if (existing == null)
                 return false;
 
-            contact.ContactId = existing.ContactId;
-            contact.ClientId = clientId;
-            _context.Entry(contact).State = EntityState.Modified;
+            existing.Number = contact.Number;
+            existing.Type = contact.Type;
+
             await _context.SaveChangesAsync();
             return true;
         }

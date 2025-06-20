@@ -23,19 +23,16 @@ namespace ApiClienteDesafio.Services
             return await _context.Addresses.FirstOrDefaultAsync(a => a.ClientId == clientId);
         }
 
-        public async Task<(AddressModel address, string error)> AddAsync(int clientId, AddressModel address)
+        public async Task<(AddressModel address, string error)> AddAsync(AddressModel address)
         {
-            // Verifica se já existe Address para este ClientId
-            var exists = await _context.Addresses.AnyAsync(a => a.ClientId == clientId);
+            var exists = await _context.Addresses.AnyAsync(a => a.ClientId == address.ClientId);
             if (exists)
                 return (null, "A client can only have one address.");
 
-            // Verifica se o Client existe
-            var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == clientId);
+            var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == address.ClientId);
             if (!clientExists)
                 return (null, "ClientId does not exist.");
 
-            address.ClientId = clientId;
             var (success, error) = await FillAddressFromViaCep(address.ZipCode, address);
             if (!success)
                 return (null, error);
@@ -45,19 +42,20 @@ namespace ApiClienteDesafio.Services
             return (address, null);
         }
 
-        public async Task<(bool success, string error)> UpdateByClientIdAsync(int clientId, AddressModel address)
+        public async Task<(bool success, string error)> UpdateByClientIdAsync(AddressModel address)
         {
-            var existing = await _context.Addresses.FirstOrDefaultAsync(a => a.ClientId == clientId);
+            var existing = await _context.Addresses.FirstOrDefaultAsync(a => a.ClientId == address.ClientId);
             if (existing == null)
                 return (false, "Address not found for this client.");
 
-            address.AddressId = existing.AddressId;
-            address.ClientId = clientId;
-            var (success, error) = await FillAddressFromViaCep(address.ZipCode, address);
+            // Atualiza apenas os campos necessários do objeto já rastreado
+            var (success, error) = await FillAddressFromViaCep(address.ZipCode, existing);
             if (!success)
                 return (false, error);
 
-            _context.Entry(address).State = EntityState.Modified;
+            existing.ZipCode = address.ZipCode;
+            existing.Number = address.Number;
+
             await _context.SaveChangesAsync();
             return (true, null);
         }
