@@ -16,8 +16,10 @@ namespace ApiClienteDesafio.Mapping
             CreateMap<AddressCreateDTO, AddressModel>();
             CreateMap<ContactModel, ContactDTO>().ReverseMap();
             CreateMap<ContactCreateDTO, ContactModel>();
+            CreateMap<AddressUpdateDTO, AddressModel>().ReverseMap();
+            CreateMap<ContactUpdateDTO, ContactModel>().ReverseMap();
+            CreateMap<ClientUpdateDTO, ClientModel>().ReverseMap();
 
-            // Mapeamento ViaCepResponse -> AddressModel
             CreateMap<ViaCepResponse, AddressModel>()
                 .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.Logradouro))
                 .ForMember(dest => dest.Neighborhood, opt => opt.MapFrom(src => src.Bairro))

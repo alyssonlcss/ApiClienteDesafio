@@ -7,6 +7,7 @@ using AutoMapper;
 using ApiClienteDesafio.Utils;
 using System.ComponentModel.DataAnnotations;
 using ApiClienteDesafio.Validators;
+using ApiClienteDesafio.DTOs;
 
 namespace ApiClienteDesafio.Services
 {
@@ -26,41 +27,20 @@ namespace ApiClienteDesafio.Services
             return await _context.Contacts.FirstOrDefaultAsync(c => c.ClientId == clientId);
         }
 
-        public async Task<ContactModel?> AddAsync(ContactModel contact)
+        public async Task<bool> UpdateByClientIdAsync(ContactUpdateDTO contactUpdate)
         {
-            if (!ValidationUtils.TryValidateObject(contact, out var validationResults))
+            if (!ValidationUtils.TryValidateObject(contactUpdate, out var validationResults))
                 throw new ValidationException(string.Join("; ", validationResults));
 
-            var (isValid, businessError) = await ContactValidator.IsBusinessValidAsync(contact, _context);
+            var (isValid, businessError) = await ContactValidator.IsBusinessValidAsync(contactUpdate, _context);
             if (!isValid)
                 throw new ValidationException(businessError);
 
-            var exists = await _context.Contacts.AnyAsync(c => c.ClientId == contact.ClientId);
-            if (exists)
-                return null;
-            var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == contact.ClientId);
-            if (!clientExists)
-                return null;
-
-            _context.Contacts.Add(contact);
-            await _context.SaveChangesAsync();
-            return contact;
-        }
-
-        public async Task<bool> UpdateByClientIdAsync(ContactModel contact)
-        {
-            if (!ValidationUtils.TryValidateObject(contact, out var validationResults))
-                throw new ValidationException(string.Join("; ", validationResults));
-
-            var (isValid, businessError) = await ContactValidator.IsBusinessValidAsync(contact, _context);
-            if (!isValid)
-                throw new ValidationException(businessError);
-
-            var existing = await _context.Contacts.FirstOrDefaultAsync(c => c.ClientId == contact.ClientId);
+            var existing = await _context.Contacts.FirstOrDefaultAsync(c => c.ClientId == contactUpdate.ClientId);
             if (existing == null)
                 return false;
 
-            _mapper.Map(contact, existing);
+            _mapper.Map(contactUpdate, existing);
 
             await _context.SaveChangesAsync();
             return true;

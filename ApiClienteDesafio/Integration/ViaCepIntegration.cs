@@ -16,7 +16,14 @@ namespace ApiClienteDesafio.Integration
         {
             var httpClient = _httpClientFactory.CreateClient();
             var url = $"https://viacep.com.br/ws/{cep}/json/";
-            return await httpClient.GetFromJsonAsync<ViaCepResponse>(url);
+            try
+            {
+                return await httpClient.GetFromJsonAsync<ViaCepResponse>(url);
+            }
+            catch (HttpRequestException)
+            {
+                return null;
+            }
         }
     }
 

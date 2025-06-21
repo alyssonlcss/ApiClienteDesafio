@@ -5,6 +5,7 @@ using ApiClienteDesafio.Services;
 using AutoMapper;
 using System.Threading.Tasks;
 using ApiClienteDesafio.Utils;
+using System.ComponentModel.DataAnnotations;
 
 namespace ApiClienteDesafio.Controllers
 {
@@ -30,34 +31,35 @@ namespace ApiClienteDesafio.Controllers
             return Ok(addressDto);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] AddressCreateDTO addressDTO)
-        {
-            var address = _mapper.Map<AddressModel>(addressDTO);
-            if (!ValidationUtils.TryValidateObject(address, out var validationResults))
-                return BadRequest(string.Join("; ", validationResults.Select(v => v.ErrorMessage)));
-            var (created, serviceError) = await _addressService.AddAsync(address);
-            if (serviceError != null) return BadRequest(serviceError);
-            var createdDto = _mapper.Map<AddressDTO>(created);
-            return CreatedAtAction(nameof(GetByClientId), new { clientId = address.ClientId }, createdDto);
-        }
-
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] AddressCreateDTO addressDTO)
+        public async Task<IActionResult> Update([FromBody] AddressUpdateDTO addressUpdate)
         {
-            var address = _mapper.Map<AddressModel>(addressDTO);
-            if (!ValidationUtils.TryValidateObject(address, out var validationResults))
-                return BadRequest(string.Join("; ", validationResults.Select(v => v.ErrorMessage)));
-            var (success, serviceError) = await _addressService.UpdateByClientIdAsync(address);
-            if (!success) return BadRequest(serviceError);
-            return NoContent();
+            try
+            {
+                var (success, serviceError) = await _addressService.UpdateByClientIdAsync(addressUpdate);
+                if (!success)
+                    return BadRequest(new { error = serviceError });
+                var updated = await _addressService.GetByClientIdAsync(addressUpdate.ClientId);
+                if (updated == null)
+                    return NotFound(new { error = "Endereço não encontrado após atualização." });
+                var updatedDto = _mapper.Map<AddressDTO>(updated);
+                return Ok(updatedDto);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Erro interno ao atualizar endereço.", details = ex.Message });
+            }
         }
 
         [HttpDelete("{clientId}")]
         public async Task<IActionResult> Delete(int clientId)
         {
             await _addressService.DeleteByClientIdAsync(clientId);
-            return NoContent();
+            return Ok(new SuccessResponseDTO { Success = true, Message = "Endereço removido com sucesso.", Id = clientId });
         }
     }
 }

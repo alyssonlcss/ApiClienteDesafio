@@ -30,34 +30,36 @@ namespace ApiClienteDesafio.Controllers
             return Ok(contactDto);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ContactCreateDTO contactDTO)
-        {
-            var contact = _mapper.Map<ContactModel>(contactDTO);
-            if (!ValidationUtils.TryValidateObject(contact, out var validationResults))
-                return BadRequest(string.Join("; ", validationResults.Select(v => v.ErrorMessage)));
-            var created = await _contactService.AddAsync(contact);
-            if (created == null) return BadRequest("A client can only have one contact or ClientId does not exist.");
-            var createdDto = _mapper.Map<ContactDTO>(created);
-            return CreatedAtAction(nameof(GetByClientId), new { clientId = contact.ClientId }, createdDto);
-        }
-
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] ContactCreateDTO contactDTO)
+        public async Task<IActionResult> Update([FromBody] ContactUpdateDTO contactUpdate)
         {
-            var contact = _mapper.Map<ContactModel>(contactDTO);
-            if (!ValidationUtils.TryValidateObject(contact, out var validationResults))
-                return BadRequest(string.Join("; ", validationResults.Select(v => v.ErrorMessage)));
-            var success = await _contactService.UpdateByClientIdAsync(contact);
-            if (!success) return BadRequest("Contact not found for this client or already exists another contact.");
-            return NoContent();
+            try
+            {
+                var success = await _contactService.UpdateByClientIdAsync(contactUpdate);
+                if (!success)
+                    return BadRequest(new { error = "Contact not found for this client or already exists another contact." });
+                var updated = await _contactService.GetByClientIdAsync(contactUpdate.ClientId);
+                var updatedDto = _mapper.Map<ContactDTO>(updated);
+                return Ok(updatedDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Erro interno ao atualizar contato.", details = ex.Message });
+            }
         }
 
         [HttpDelete("{clientId}")]
         public async Task<IActionResult> Delete(int clientId)
         {
-            await _contactService.DeleteByClientIdAsync(clientId);
-            return NoContent();
+            try
+            {
+                await _contactService.DeleteByClientIdAsync(clientId);
+                return Ok(new SuccessResponseDTO { Success = true, Message = "Contato removido com sucesso.", Id = clientId });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Erro interno ao remover contato.", details = ex.Message });
+            }
         }
     }
 }

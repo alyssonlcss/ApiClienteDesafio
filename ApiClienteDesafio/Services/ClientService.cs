@@ -44,6 +44,19 @@ namespace ApiClienteDesafio.Services
         {
             if (!ValidationUtils.TryValidateObject(client, out var validationResults))
                 throw new ValidationException(string.Join("; ", validationResults));
+
+            if (client.Contact != null && !ContactUtils.IsValidCellPhone(client.Contact.Number))
+                throw new ValidationException("Número de celular inválido. Formato esperado: DDD + 9 dígitos, ex: 11999999999");
+
+            if (client.Address != null)
+            {
+                var viaCepData = await _viaCepIntegration.GetAddressByCepAsync(client.Address.ZipCode);
+                if (viaCepData == null || viaCepData.Erro == "true")
+                    throw new ValidationException("CEP inválido ou não encontrado na base ViaCEP.");
+                _mapper.Map(viaCepData, client.Address);
+            }
+
+            client.CreateDate = DateTime.UtcNow;
             _context.Clients.Add(client);
             await _context.SaveChangesAsync();
             return client;
@@ -65,39 +78,38 @@ namespace ApiClienteDesafio.Services
             if (existingClient == null)
                 throw new System.InvalidOperationException("Client should exist after business validation, but was not found.");
 
-            _mapper.Map(client, existingClient);
+            if (!string.IsNullOrWhiteSpace(client.Name))
+                existingClient.Name = client.Name;
 
             if (client.Address != null)
             {
-                var viaCepData = await _viaCepIntegration.GetAddressByCepAsync(client.Address.ZipCode);
-                if (viaCepData != null && viaCepData.Erro != "true")
+                var address = client.Address;
+                var viaCepData = await _viaCepIntegration.GetAddressByCepAsync(address.ZipCode);
+                if (viaCepData == null || viaCepData.Erro == "true")
+                    return (false, "CEP inválido ou não encontrado na base ViaCEP.");
+                if (existingClient.Address == null)
                 {
-                    var viaCepAddress = _mapper.Map<AddressModel>(viaCepData);
-                    if (existingClient.Address == null)
-                    {
-                        existingClient.Address = client.Address;
-                    }
-                    AddressUtils.ApplyViaCepData(existingClient.Address ?? client.Address, viaCepAddress);
-                }
-                else if (existingClient.Address == null)
-                {
-                    existingClient.Address = client.Address;
+                    existingClient.Address = _mapper.Map<AddressModel>(address);
                 }
                 else
                 {
-                    _mapper.Map(client.Address, existingClient.Address);
+                    _mapper.Map(address, existingClient.Address);
                 }
+                _mapper.Map(viaCepData, existingClient.Address);
             }
 
             if (client.Contact != null)
             {
+                var contact = client.Contact;
+                if (!ContactUtils.IsValidCellPhone(contact.Number))
+                    return (false, "Número de celular inválido. Formato esperado: DDD + 9 dígitos, ex: 11999999999");
                 if (existingClient.Contact == null)
                 {
-                    existingClient.Contact = client.Contact;
+                    existingClient.Contact = _mapper.Map<ContactModel>(contact);
                 }
                 else
                 {
-                    _mapper.Map(client.Contact, existingClient.Contact);
+                    _mapper.Map(contact, existingClient.Contact);
                 }
             }
 

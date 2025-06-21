@@ -9,6 +9,7 @@ using AutoMapper;
 using ApiClienteDesafio.Utils;
 using System.ComponentModel.DataAnnotations;
 using ApiClienteDesafio.Validators;
+using ApiClienteDesafio.DTOs;
 
 namespace ApiClienteDesafio.Services
 {
@@ -30,46 +31,28 @@ namespace ApiClienteDesafio.Services
             return await _context.Addresses.FirstOrDefaultAsync(a => a.ClientId == clientId);
         }
 
-        public async Task<(AddressModel? address, string? error)> AddAsync(AddressModel address)
+        public async Task<(bool success, string? error)> UpdateByClientIdAsync(AddressUpdateDTO addressUpdate)
         {
-            if (!ValidationUtils.TryValidateObject(address, out var validationResults))
-                throw new ValidationException(string.Join("; ", validationResults));
+            if (!ValidationUtils.TryValidateObject(addressUpdate, out var validationResults))
+                return (false, string.Join("; ", validationResults));
 
-            var (isValid, businessError) = await AddressValidator.IsBusinessValidAsync(address.ClientId, _context);
-            if (!isValid)
-                return (null, businessError);
-
-            var viaCepData = await _viaCepIntegration.GetAddressByCepAsync(address.ZipCode);
-            if (viaCepData == null || viaCepData.Erro == "true")
-                return (null, "Invalid or not found ZipCode (CEP).");
-            var viaCepAddress = _mapper.Map<AddressModel>(viaCepData);
-            AddressUtils.ApplyViaCepData(address, viaCepAddress);
-
-            _context.Addresses.Add(address);
-            await _context.SaveChangesAsync();
-            return (address, null);
-        }
-
-        public async Task<(bool success, string? error)> UpdateByClientIdAsync(AddressModel address)
-        {
-            if (!ValidationUtils.TryValidateObject(address, out var validationResults))
-                throw new ValidationException(string.Join("; ", validationResults));
-
-            var (isValid, businessError) = await AddressValidator.IsBusinessValidAsync(address.ClientId, _context);
+            var (isValid, businessError) = await AddressValidator.IsBusinessValidAsync(addressUpdate.ClientId, _context);
             if (!isValid)
                 return (false, businessError);
 
-            var existing = await _context.Addresses.FirstOrDefaultAsync(a => a.ClientId == address.ClientId);
+            var existing = await _context.Addresses.FirstOrDefaultAsync(a => a.ClientId == addressUpdate.ClientId);
             if (existing == null)
-                return (false, "Address not found for this client.");
+                return (false, "Endereço não encontrado para este cliente.");
 
-            var viaCepData = await _viaCepIntegration.GetAddressByCepAsync(address.ZipCode);
+            var viaCepData = await _viaCepIntegration.GetAddressByCepAsync(addressUpdate.ZipCode);
             if (viaCepData == null || viaCepData.Erro == "true")
-                return (false, "Invalid or not found ZipCode (CEP).");
-            var viaCepAddress = _mapper.Map<AddressModel>(viaCepData);
-            AddressUtils.ApplyViaCepData(address, viaCepAddress);
+                return (false, "CEP inválido ou não encontrado na base ViaCEP.");
 
-            _mapper.Map(address, existing);
+            if (!string.IsNullOrWhiteSpace(addressUpdate.Number))
+                existing.Number = addressUpdate.Number;
+            if (!string.IsNullOrWhiteSpace(addressUpdate.Complement))
+                existing.Complement = addressUpdate.Complement;
+            _mapper.Map(viaCepData, existing);
 
             await _context.SaveChangesAsync();
             return (true, null);
