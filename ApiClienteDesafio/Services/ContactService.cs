@@ -38,9 +38,14 @@ namespace ApiClienteDesafio.Services
 
             var existing = await _context.Contacts.FirstOrDefaultAsync(c => c.ClientId == contactUpdate.ClientId);
             if (existing == null)
-                return false;
+                throw new ValidationException("Contact not found for this client.");
 
-            _mapper.Map(contactUpdate, existing);
+            if (!string.IsNullOrWhiteSpace(contactUpdate.Number))
+                existing.Number = contactUpdate.Number;
+            if (!string.IsNullOrWhiteSpace(contactUpdate.Type))
+                existing.Type = contactUpdate.Type;
+            if (!string.IsNullOrWhiteSpace(contactUpdate.Email))
+                existing.Email = contactUpdate.Email;
 
             await _context.SaveChangesAsync();
             return true;
@@ -53,6 +58,10 @@ namespace ApiClienteDesafio.Services
             {
                 _context.Contacts.Remove(contact);
                 await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new ValidationException("Contact not found for this client.");
             }
         }
     }

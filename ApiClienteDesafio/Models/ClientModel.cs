@@ -10,7 +10,9 @@ namespace ApiClienteDesafio.Models
         [StringLength(100)]
         public string Name { get; set; } = string.Empty;
         public DateTime CreateDate { get; set; }
-        public AddressModel? Address { get; set; }
-        public ContactModel? Contact { get; set; }
+        [Required]
+        public AddressModel Address { get; set; }
+        [Required]
+        public ContactModel Contact { get; set; }
     }
 }

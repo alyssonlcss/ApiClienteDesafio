@@ -3,21 +3,22 @@ using ApiClienteDesafio.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using ApiClienteDesafio.Utils;
+using ApiClienteDesafio.DTOs;
 
 namespace ApiClienteDesafio.Validators
 {
     public static class ClientValidator
     {
-        public static async Task<(bool isValid, string error)> IsBusinessValidAsync(int clientId, AppDbContext context, string? phoneNumber = null)
+        public static async Task<(bool isValid, string error)> IsBusinessValidAsync(ClientCreateDTO clientCreate, AppDbContext context)
         {
-            if (!string.IsNullOrEmpty(phoneNumber) && !ContactUtils.IsValidCellPhone(phoneNumber))
+            if (!string.IsNullOrEmpty(clientCreate.Contact.Number) && !ContactUtils.IsValidCellPhone(clientCreate.Contact.Number))
                 return (false, "Número de celular inválido. Formato esperado: DDD + 9 dígitos, ex: 11999999999");
-            var exists = await context.Addresses.AnyAsync(a => a.ClientId == clientId);
-            if (!exists)
-                return (false, "Client does not have an Address.");
-            var clientExists = await context.Clients.AnyAsync(c => c.ClientId == clientId);
-            if (!clientExists)
-                return (false, "ClientId does not exist.");
+            var emailExists = await context.Contacts.AnyAsync(c => c.Email == clientCreate.Contact.Email);
+            if (emailExists)
+                return (false, "Email already registered for another contact.");
+            var phoneExists = await context.Contacts.AnyAsync(c => c.Number == clientCreate.Contact.Number);
+            if (phoneExists)
+                return (false, "Cell phone number already registered for another contact.");
             return (true, string.Empty);
         }
     }

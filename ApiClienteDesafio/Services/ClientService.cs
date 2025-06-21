@@ -8,6 +8,7 @@ using AutoMapper;
 using ApiClienteDesafio.Utils;
 using System.ComponentModel.DataAnnotations;
 using ApiClienteDesafio.Validators;
+using ApiClienteDesafio.DTOs;
 
 namespace ApiClienteDesafio.Services
 {
@@ -40,77 +41,78 @@ namespace ApiClienteDesafio.Services
                 .FirstOrDefaultAsync(c => c.ClientId == clientId);
         }
 
-        public async Task<ClientModel> AddAsync(ClientModel client)
+        public async Task<ClientModel> AddAsync(ClientCreateDTO clientCreate)
         {
-            if (!ValidationUtils.TryValidateObject(client, out var validationResults))
+            if (!ValidationUtils.TryValidateObject(clientCreate, out var validationResults))
                 throw new ValidationException(string.Join("; ", validationResults));
+            
+            var (isValid, businessError) = await ClientValidator.IsBusinessValidAsync(clientCreate, _context);
+            if (!isValid)
+                throw new ValidationException(businessError);
 
-            if (client.Contact != null && !ContactUtils.IsValidCellPhone(client.Contact.Number))
-                throw new ValidationException("Número de celular inválido. Formato esperado: DDD + 9 dígitos, ex: 11999999999");
-
-            if (client.Address != null)
+            var newClient = _mapper.Map<ClientModel>(clientCreate);
+            if (clientCreate.Address != null)
             {
-                var viaCepData = await _viaCepIntegration.GetAddressByCepAsync(client.Address.ZipCode);
+                var viaCepData = await _viaCepIntegration.GetAddressByCepAsync(clientCreate.Address.ZipCode);
                 if (viaCepData == null || viaCepData.Erro == "true")
-                    throw new ValidationException("CEP inválido ou não encontrado na base ViaCEP.");
-                _mapper.Map(viaCepData, client.Address);
+                    throw new ValidationException("Invalid or not found ZipCode (CEP).");
+                _mapper.Map(viaCepData, newClient.Address);
             }
-
-            client.CreateDate = DateTime.UtcNow;
-            _context.Clients.Add(client);
+            
+            newClient.CreateDate = DateTime.UtcNow;
+            _context.Clients.Add(newClient);
             await _context.SaveChangesAsync();
-            return client;
+            return newClient;
         }
 
-        public async Task<(bool success, string? error)> UpdateAsync(ClientModel client)
+        public async Task<(bool success, string? error)> UpdateAsync(ClientUpdateDTO clientUpdate)
         {
-            if (!ValidationUtils.TryValidateObject(client, out var validationResults))
-                return (false, string.Join("; ", validationResults));
 
-            var (isValid, businessError) = await ClientValidator.IsBusinessValidAsync(client.ClientId, _context);
-            if (!isValid)
-                return (false, businessError);
+            if (!ValidationUtils.TryValidateObject(clientUpdate, out var validationResults))
+                return (false, string.Join("; ", validationResults));
+            
+            if (clientUpdate.Contact != null)
+            {
+                clientUpdate.Contact.ClientId = clientUpdate.ClientId;
+                var (isValidContact, businessErrorContact) = await ContactValidator.IsBusinessValidAsync(clientUpdate.Contact, _context);
+                if (!isValidContact)
+                    return (false, businessErrorContact);
+            }
 
             var existingClient = await _context.Clients
                 .Include(c => c.Address)
                 .Include(c => c.Contact)
-                .FirstOrDefaultAsync(c => c.ClientId == client.ClientId);
+                .FirstOrDefaultAsync(c => c.ClientId == clientUpdate.ClientId);
             if (existingClient == null)
-                throw new System.InvalidOperationException("Client should exist after business validation, but was not found.");
+                return (false, "Client not found.");
 
-            if (!string.IsNullOrWhiteSpace(client.Name))
-                existingClient.Name = client.Name;
+            if (!string.IsNullOrWhiteSpace(clientUpdate.Name))
+                existingClient.Name = clientUpdate.Name;
 
-            if (client.Address != null)
+            if (clientUpdate.Address != null)
             {
-                var address = client.Address;
+                var address = clientUpdate.Address;
                 var viaCepData = await _viaCepIntegration.GetAddressByCepAsync(address.ZipCode);
                 if (viaCepData == null || viaCepData.Erro == "true")
-                    return (false, "CEP inválido ou não encontrado na base ViaCEP.");
-                if (existingClient.Address == null)
-                {
-                    existingClient.Address = _mapper.Map<AddressModel>(address);
-                }
-                else
-                {
-                    _mapper.Map(address, existingClient.Address);
-                }
+                    return (false, "Invalid or not found ZipCode (CEP).");
+                
                 _mapper.Map(viaCepData, existingClient.Address);
             }
 
-            if (client.Contact != null)
+            if (clientUpdate.Contact != null)
             {
-                var contact = client.Contact;
-                if (!ContactUtils.IsValidCellPhone(contact.Number))
-                    return (false, "Número de celular inválido. Formato esperado: DDD + 9 dígitos, ex: 11999999999");
                 if (existingClient.Contact == null)
-                {
-                    existingClient.Contact = _mapper.Map<ContactModel>(contact);
-                }
+                    existingClient.Contact = _mapper.Map<ContactModel>(clientUpdate.Contact);
                 else
                 {
-                    _mapper.Map(contact, existingClient.Contact);
+                    if (!string.IsNullOrWhiteSpace(clientUpdate.Contact.Number))
+                    existingClient.Contact.Number = clientUpdate.Contact.Number;
+                    if (!string.IsNullOrWhiteSpace(clientUpdate.Contact.Type))
+                        existingClient.Contact.Type = clientUpdate.Contact.Type;
+                    if (!string.IsNullOrWhiteSpace(clientUpdate.Contact.Email))
+                        existingClient.Contact.Email = clientUpdate.Contact.Email;
                 }
+                
             }
 
             await _context.SaveChangesAsync();

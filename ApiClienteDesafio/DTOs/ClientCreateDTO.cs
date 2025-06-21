@@ -6,6 +6,7 @@ namespace ApiClienteDesafio.DTOs
     {
         [Required]
         public string Name { get; set; } = string.Empty;
+        public DateTime? CreateDate { get; set; } 
         [Required]
         public required AddressCreateDTO Address { get; set; }
         [Required]

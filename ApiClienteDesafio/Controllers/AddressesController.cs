@@ -41,7 +41,7 @@ namespace ApiClienteDesafio.Controllers
                     return BadRequest(new { error = serviceError });
                 var updated = await _addressService.GetByClientIdAsync(addressUpdate.ClientId);
                 if (updated == null)
-                    return NotFound(new { error = "Endereço não encontrado após atualização." });
+                    return NotFound(new { error = "Address not found after update." });
                 var updatedDto = _mapper.Map<AddressDTO>(updated);
                 return Ok(updatedDto);
             }
@@ -51,7 +51,7 @@ namespace ApiClienteDesafio.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Erro interno ao atualizar endereço.", details = ex.Message });
+                return StatusCode(500, new { error = "Internal server error while updating address.", details = ex.Message });
             }
         }
 
@@ -59,7 +59,7 @@ namespace ApiClienteDesafio.Controllers
         public async Task<IActionResult> Delete(int clientId)
         {
             await _addressService.DeleteByClientIdAsync(clientId);
-            return Ok(new SuccessResponseDTO { Success = true, Message = "Endereço removido com sucesso.", Id = clientId });
+            return Ok(new SuccessResponseDTO { Success = true, Message = "Address successfully deleted.", Id = clientId });
         }
     }
 }

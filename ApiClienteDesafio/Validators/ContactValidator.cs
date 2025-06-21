@@ -12,10 +12,17 @@ namespace ApiClienteDesafio.Validators
         public static async Task<(bool isValid, string error)> IsBusinessValidAsync(ContactUpdateDTO contactUpdate, AppDbContext context)
         {
             if (!ContactUtils.IsValidCellPhone(contactUpdate.Number))
-                return (false, "Número de celular inválido. Formato esperado: DDD + 9 dígitos, ex: 11999999999");
+                return (false, "Invalid cell phone number. Expected format: DDD + 9 digits, e.g., 11999999999");
+
+            var emailExists = await context.Contacts.AnyAsync(c => c.Email == contactUpdate.Email && c.ClientId != contactUpdate.ClientId);
+            if (emailExists && !string.IsNullOrEmpty(contactUpdate.Email))
+                return (false, "Email already registered for another contact.");
+            var phoneExists = await context.Contacts.AnyAsync(c => c.Number == contactUpdate.Number && c.ClientId != contactUpdate.ClientId);
+            if (phoneExists && !string.IsNullOrEmpty(contactUpdate.Number))
+                return (false, "Cell phone number already registered for another contact.");
             var exists = await context.Contacts.AnyAsync(c => c.ClientId == contactUpdate.ClientId);
             if (!exists)
-                return (false, "A client can only have one contact.");
+                return (false, "Contact not found for this client.");
             var clientExists = await context.Clients.AnyAsync(c => c.ClientId == contactUpdate.ClientId);
             if (!clientExists)
                 return (false, "ClientId does not exist.");

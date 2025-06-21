@@ -5,6 +5,7 @@ using ApiClienteDesafio.Services;
 using AutoMapper;
 using System.Threading.Tasks;
 using ApiClienteDesafio.Utils;
+using System.ComponentModel.DataAnnotations;
 
 namespace ApiClienteDesafio.Controllers
 {
@@ -42,24 +43,21 @@ namespace ApiClienteDesafio.Controllers
                 var updatedDto = _mapper.Map<ContactDTO>(updated);
                 return Ok(updatedDto);
             }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Erro interno ao atualizar contato.", details = ex.Message });
+                return StatusCode(500, new { error = "Internal server error while updating contact.", details = ex.Message });
             }
         }
 
         [HttpDelete("{clientId}")]
         public async Task<IActionResult> Delete(int clientId)
         {
-            try
-            {
-                await _contactService.DeleteByClientIdAsync(clientId);
-                return Ok(new SuccessResponseDTO { Success = true, Message = "Contato removido com sucesso.", Id = clientId });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = "Erro interno ao remover contato.", details = ex.Message });
-            }
+            await _contactService.DeleteByClientIdAsync(clientId);
+            return Ok(new SuccessResponseDTO { Success = true, Message = "Contact successfully deleted.", Id = clientId });
         }
     }
 }

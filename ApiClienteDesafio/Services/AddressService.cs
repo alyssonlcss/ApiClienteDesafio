@@ -42,16 +42,13 @@ namespace ApiClienteDesafio.Services
 
             var existing = await _context.Addresses.FirstOrDefaultAsync(a => a.ClientId == addressUpdate.ClientId);
             if (existing == null)
-                return (false, "Endereço não encontrado para este cliente.");
+                return (false, "Address not found for this client.");
 
             var viaCepData = await _viaCepIntegration.GetAddressByCepAsync(addressUpdate.ZipCode);
             if (viaCepData == null || viaCepData.Erro == "true")
-                return (false, "CEP inválido ou não encontrado na base ViaCEP.");
+                return (false, "Invalid or not found ZipCode (CEP).");
 
-            if (!string.IsNullOrWhiteSpace(addressUpdate.Number))
-                existing.Number = addressUpdate.Number;
-            if (!string.IsNullOrWhiteSpace(addressUpdate.Complement))
-                existing.Complement = addressUpdate.Complement;
+            _mapper.Map(addressUpdate, existing);
             _mapper.Map(viaCepData, existing);
 
             await _context.SaveChangesAsync();

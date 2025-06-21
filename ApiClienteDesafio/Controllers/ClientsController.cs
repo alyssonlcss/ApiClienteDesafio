@@ -55,14 +55,14 @@ namespace ApiClienteDesafio.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ClientCreateDTO clientDTO)
+        public async Task<IActionResult> Create([FromBody] ClientCreateDTO clientCreate)
         {
             try
             {
-                var client = _mapper.Map<ClientModel>(clientDTO);
-                client.Address = _mapper.Map<AddressModel>(clientDTO.Address);
-                client.Contact = _mapper.Map<ContactModel>(clientDTO.Contact);
-                var created = await _clientService.AddAsync(client);
+                var client = _mapper.Map<ClientModel>(clientCreate);
+                client.Address = _mapper.Map<AddressModel>(clientCreate.Address);
+                client.Contact = _mapper.Map<ContactModel>(clientCreate.Contact);
+                var created = await _clientService.AddAsync(clientCreate);
                 var createdDto = _mapper.Map<ClientDTO>(created);
                 return CreatedAtAction(nameof(GetById), new { clientId = created.ClientId }, createdDto);
             }
@@ -72,26 +72,25 @@ namespace ApiClienteDesafio.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Erro interno ao criar cliente.", details = ex.Message });
+                return StatusCode(500, new { error = "Internal server error while creating client.", details = ex.Message });
             }
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] ClientUpdateDTO clientDTO)
+        public async Task<IActionResult> Update([FromBody] ClientUpdateDTO clientUpdate)
         {
             try
             {
-                var client = _mapper.Map<ClientModel>(clientDTO);
-                var (success, error) = await _clientService.UpdateAsync(client);
+                var (success, error) = await _clientService.UpdateAsync(clientUpdate);
                 if (!success)
                 {
                     if (error == "ClientId does not exist.")
                         return NotFound(new { error = error });
                     return BadRequest(new { error = error });
                 }
-                var updated = await _clientService.GetByIdAsync(client.ClientId);
+                var updated = await _clientService.GetByIdAsync(clientUpdate.ClientId);
                 if (updated == null)
-                    return NotFound(new { error = "Cliente não encontrado após atualização." });
+                    return NotFound(new { error = "Client not found after update." });
                 var updatedDto = new
                 {
                     updated.ClientId,
@@ -108,7 +107,7 @@ namespace ApiClienteDesafio.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Erro interno ao atualizar cliente.", details = ex.Message });
+                return StatusCode(500, new { error = "Internal server error while updating client.", details = ex.Message });
             }
         }
 
@@ -118,11 +117,11 @@ namespace ApiClienteDesafio.Controllers
             try
             {
                 await _clientService.DeleteAsync(clientId);
-                return Ok(new SuccessResponseDTO { Success = true, Message = "Cliente removido com sucesso.", Id = clientId });
+                return Ok(new SuccessResponseDTO { Success = true, Message = "Client successfully deleted.", Id = clientId });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { error = "Erro interno ao remover cliente.", details = ex.Message });
+                return StatusCode(500, new { error = "Internal server error while deleting client.", details = ex.Message });
             }
         }
     }

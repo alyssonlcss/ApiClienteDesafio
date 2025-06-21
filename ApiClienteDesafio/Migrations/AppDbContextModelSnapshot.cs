@@ -154,9 +154,11 @@ namespace ApiClienteDesafio.Migrations
 
             modelBuilder.Entity("ApiClienteDesafio.Models.ClientModel", b =>
                 {
-                    b.Navigation("Address");
+                    b.Navigation("Address")
+                        .IsRequired();
 
-                    b.Navigation("Contact");
+                    b.Navigation("Contact")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
