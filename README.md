@@ -8,6 +8,40 @@ A API permite o cadastro de clientes, onde o endereço é preenchido automaticam
 
 ---
 
+## Testes - Postman Collection
+
+Para testar os endpoints da API, uma coleção completa do Postman é fornecida no arquivo `ApiClienteDesafioRequestsTests.postman_collection.json` na raiz do projeto. Siga os passos abaixo para importá-la e utilizá-la:
+
+1. **Abra o Postman**
+   - Baixe e instale o Postman se ainda não o tiver: https://www.postman.com/downloads/
+
+2. **Importe a Coleção**
+   - Clique em `Import` no canto superior esquerdo do Postman.
+   - Selecione o arquivo `ApiClienteDesafioRequestsTests.postman_collection.json` do diretório do seu projeto.
+   - A coleção chamada `ApiClienteDesafio` aparecerá no seu espaço de trabalho.
+
+3. **Defina a Variável de Ambiente**
+   - A coleção utiliza a variável `baseUrl` (padrão: `http://localhost:5199`).
+   - Você pode definir ou editar essa variável no Postman clicando no olhar rápido da `Environment` (ícone de olho) no canto superior direito, em seguida, `Edit` ou `Add` um novo ambiente com a variável:
+     - `baseUrl` = `http://localhost:5199` (ou a URL da sua API em execução)
+   - Selecione este ambiente antes de executar as requisições.
+
+4. **Execute as Requisições**
+   - Expanda as pastas da coleção (`clients`, `addresses`, `contacts`) para ver todas as requisições disponíveis (GET, POST, PUT, DELETE).
+   - Cada requisição contém exemplos de payloads e comentários para te guiar.
+   - Ajuste os corpos das requisições conforme necessário e clique em `Send` para testar os endpoints.
+
+5. **Verifique as Respostas**
+   - Respostas bem-sucedidas e de erro são padronizadas em inglês.
+   - Você pode ver exemplos de respostas na coleção ou na aba de resposta do Postman após enviar uma requisição.
+
+> **Dica:**
+> - A coleção abrange todas as operações principais: criar, atualizar, obter e excluir para clientes, endereços e contatos.
+> - Restrições exclusivas (email, telefone) e campos obrigatórios são aplicados conforme as regras do desafio.
+> - Para mais detalhes sobre os formatos de solicitação/resposta, veja os corpos de exemplo em cada solicitação ou consulte a documentação do Swagger em `/swagger`.
+
+---
+
 ## Tecnologias Utilizadas
 
 - **.NET 8.0**

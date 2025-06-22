@@ -1,0 +1,699 @@
+{
+	"info": {
+		"_postman_id": "a60439e2-f471-4c82-8274-c5295d41d06e",
+		"name": "ApiClienteDesafio",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21308133"
+	},
+	"item": [
+		{
+			"name": "addresses",
+			"item": [
+				{
+					"name": "/addresses",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " //? ===> não é obrigatório\n\n{\n  \"clientId\": 2,\n  \"number\": \"111\",\n  \"zipCode\": \"65903-103\"\n  //,\"complement\": \"proximo a UP\" //?\n  //\"street\": \"Rua Luar de Prata\", //?\n  //\"neighborhood\": \"Bela Vista\", //?\n  //\"city\": \"Vitória de Santo Antão\", //?\n  //\"state\": \"PE\" //?\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/addresses",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"addresses"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientId\": 24484160,\n  \"street\": \"et\",\n  \"number\": \"minim fugiat anim qui et\",\n  \"complement\": \"ullamco elit\",\n  \"neighborhood\": \"voluptate aliquip\",\n  \"city\": \"id quis\",\n  \"state\": \"Duis do magna\",\n  \"zipCode\": \"dolor nostrud commodo veniam\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/addresses",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"addresses"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/addresses/:clientId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/addresses/:clientId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"addresses",
+								":clientId"
+							],
+							"variable": [
+								{
+									"key": "clientId",
+									"value": "2",
+									"description": "(Required) - A busca é feita pelo ClientId"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/addresses/:clientId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"addresses",
+										":clientId"
+									],
+									"variable": [
+										{
+											"key": "clientId"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/addresses/:clientId",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/addresses/:clientId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"addresses",
+								":clientId"
+							],
+							"variable": [
+								{
+									"key": "clientId",
+									"value": "2",
+									"description": "(Required) - O delete é feito pelo ClientId"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/addresses/:clientId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"addresses",
+										":clientId"
+									],
+									"variable": [
+										{
+											"key": "clientId"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "clients",
+			"item": [
+				{
+					"name": "/clients",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " //? ===> não é obrigatório\n\n{\n  \"name\": \"Empresa Fictícia 1\",\n  \"address\": {\n    \"number\": \"123\",\n    //\"street\": \"Rua da Inovação\", //?\n    //\"complement\": \"Sala 101\", //?\n    //\"neighborhood\": \"Centro\", //?\n    //\"city\": \"Russas\", //?\n    //\"state\": \"CE\", //?\n    \"zipCode\": \"77016-342\"\n  },\n  \"contact\": {\n    \"number\": \"88911111113\",\n    \"type\": \"Celular\",\n    \"email\": \"contato2@empresaficticia.com\"\n  }\n}\n/*\nFiz Algumas validações de \"bussiness\", não pode haver email ou telefone são únicos,\nentão não é permitido um client ter email ou telefone de outro client cadastrado\n*/",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/clients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"address\": {\n    \"number\": \"consequat voluptate ex elit\",\n    \"zipCode\": \"incididunt velit labore\",\n    \"street\": \"aute eu in\",\n    \"complement\": \"ut dolore consectetur nostrud\",\n    \"neighborhood\": \"Lorem ut occaecat dolore amet\",\n    \"city\": \"sit Ut exercitation reprehenderit dolor\",\n    \"state\": \"eu laboris Ut et\"\n  },\n  \"contact\": {\n    \"email\": \"BeprU08x2QvMB@bfchteFtLrdwSCYdtv.kv\",\n    \"number\": \"irure elit qui aliqu\",\n    \"type\": \"est anim dolor consectetur\"\n  },\n  \"name\": \"nisi\",\n  \"createDate\": \"1992-12-05T06:09:56.436Z\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/clients",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"clients"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/clients",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " //? ===> não é obrigatório\n\n{\n  \"clientId\": 2,\n  \"name\": \"Empresa Fictícia Update\", //?\n  \"address\": { //?\n    \"number\": \"111\", //obrigatório se address não for null\n    \"zipCode\": \"55608-435\" //obrigatório se address não for null\n    ,\"complement\": \"proximo a UP\" //?\n    //\"street\": \"Rua Luar de Prata\", //?\n    //\"neighborhood\": \"Bela Vista\", //?\n    //\"city\": \"Vitória de Santo Antão\", //?\n    //\"state\": \"PE\" //?\n  }\n  ,\"contact\": { //?\n    \"email\": \"teste@gmail.com\", //obrigatório se contact não for null\n    \"number\": \"88911111112\", //obrigatório se contact não for null\n    \"type\": \"pessoal \" //obrigatório se contact não for null\n  }\n}\n\n/*\nFiz Algumas validações de \"bussiness\", não pode haver email ou telefone são únicos,\nentão não é permitido um client ter email ou telefone de outro client cadastrado\n*/",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/clients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientId\": -44179391,\n  \"name\": \"nulla ad\",\n  \"address\": {\n    \"number\": \"anim in cillum nostrud\",\n    \"zipCode\": \"in incididunt Ut\",\n    \"street\": \"velit culpa commodo\",\n    \"complement\": \"tempor adipisicing ip\",\n    \"neighborhood\": \"consequat Ut pariatur\",\n    \"city\": \"ut proident non Duis Lorem\",\n    \"state\": \"ipsum magna adipisicing ut reprehenderit\"\n  },\n  \"contact\": {\n    \"email\": \"FMjkh4JcDplEqU@XQCUQbGQZtJJvEjN.uddh\",\n    \"number\": \"culpa id\",\n    \"type\": \"dolore \"\n  }\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/clients",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"clients"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/clients/all-clients",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/clients/all-clients",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients",
+								"all-clients"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/clients/all-clients",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"clients",
+										"all-clients"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/clients/:clientId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/clients/:clientId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients",
+								":clientId"
+							],
+							"variable": [
+								{
+									"key": "clientId",
+									"value": "2",
+									"description": "(Required) - A busca é feita pelo ClientId"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/clients/:clientId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"clients",
+										":clientId"
+									],
+									"variable": [
+										{
+											"key": "clientId"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/clients/:clientId",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/clients/:clientId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"clients",
+								":clientId"
+							],
+							"variable": [
+								{
+									"key": "clientId",
+									"value": "1",
+									"description": "(Required) - O delete é feito pelo ClientId"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/clients/:clientId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"clients",
+										":clientId"
+									],
+									"variable": [
+										{
+											"key": "clientId"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "contacts",
+			"item": [
+				{
+					"name": "/contacts",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": " //? ===> não é obrigatório\n\n{\n  \"clientId\": 2,\n  \"number\": \"88911111112\", //?\n  \"type\": \"work1\", //?\n  \"email\": \"teste2@gmail.com\" //?\n}",
+							"options": {
+								"raw": {
+									"headerFamily": "json",
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/contacts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"contacts"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientId\": -69787564,\n  \"number\": \"veniam adipisicing ullamco\",\n  \"type\": \"do velit\",\n  \"email\": \"tempor anim eu\"\n}",
+									"options": {
+										"raw": {
+											"headerFamily": "json",
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/contacts",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"contacts"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/contacts/:clientId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/contacts/:clientId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"contacts",
+								":clientId"
+							],
+							"variable": [
+								{
+									"key": "clientId",
+									"value": "2",
+									"description": "(Required) - A busca é feita pelo ClientId"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/contacts/:clientId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"contacts",
+										":clientId"
+									],
+									"variable": [
+										{
+											"key": "clientId"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				},
+				{
+					"name": "/contacts/:clientId",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/contacts/:clientId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"contacts",
+								":clientId"
+							],
+							"variable": [
+								{
+									"key": "clientId",
+									"value": "2",
+									"description": "(Required) - O delete é feito pelo ClientId"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "OK",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/contacts/:clientId",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"contacts",
+										":clientId"
+									],
+									"variable": [
+										{
+											"key": "clientId"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "text",
+							"header": [],
+							"cookie": [],
+							"body": ""
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5199"
+		}
+	]
+}
