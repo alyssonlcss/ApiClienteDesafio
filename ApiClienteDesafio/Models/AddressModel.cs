@@ -22,7 +22,7 @@ namespace ApiClienteDesafio.Models
         public string City { get; set; } = string.Empty;
         [Required]
         [StringLength(2)]
-        public string State { get; set; }
+        public string? State { get; set; }
         [Required]
         [StringLength(10)]
         public string ZipCode { get; set; } = string.Empty;

@@ -7,6 +7,7 @@ namespace ApiClienteDesafio.Utils
     {
         public static bool TryValidateObject<T>(T obj, out List<ValidationResult> results)
         {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
             var context = new ValidationContext(obj, null, null);
             results = new List<ValidationResult>();
             return Validator.TryValidateObject(obj, context, results, true);

@@ -24,18 +24,37 @@ namespace ApiClienteDesafio.Validators
 
         public static async Task<(bool isValid, string error)> IsBusinessValidUpdateAsync(ClientUpdateDTO clientUpdate, AppDbContext context)
         {
-            
-            if (!string.IsNullOrEmpty(clientUpdate.Contact.Number) && !ContactUtils.IsValidCellPhone(clientUpdate.Contact.Number))
+            var contact = clientUpdate.Contact;
+            if (contact == null)
+                return (false, "Contact data is required.");
+
+            if (!string.IsNullOrEmpty(contact.Number) && !ContactUtils.IsValidCellPhone(contact.Number))
                 return (false, "Invalid cell phone number. Expected format: DDD + 9 digits, e.g., 11999999999");
-            var emailExists = await context.Contacts.AnyAsync(c => c.Email == clientUpdate.Contact.Email && c.ClientId != clientUpdate.ClientId);
-            if (emailExists && !string.IsNullOrEmpty(clientUpdate.Contact.Email))
-                return (false, "Email already registered for another contact.");
-            var phoneExists = await context.Contacts.AnyAsync(c => c.Number == clientUpdate.Contact.Number && c.ClientId != clientUpdate.ClientId);
-            if (phoneExists && !string.IsNullOrEmpty(clientUpdate.Contact.Number))
-                return (false, "Cell phone number already registered for another contact.");
-            var clientExists = await context.Clients.AnyAsync(c => c.ClientId == clientUpdate.ClientId);
+
+            if (!string.IsNullOrEmpty(contact.Email))
+            {
+                bool emailExists = await context.Contacts.AnyAsync(c =>
+                    c.Email == contact.Email && c.ClientId != clientUpdate.ClientId);
+                if (emailExists)
+                    return (false, "Email already registered for another contact.");
+            }
+
+            if (!string.IsNullOrEmpty(contact.Number))
+            {
+                bool phoneExists = await context.Contacts.AnyAsync(c =>
+                    c.Number == contact.Number && c.ClientId != clientUpdate.ClientId);
+                if (phoneExists)
+                    return (false, "Cell phone number already registered for another contact.");
+            }
+
+            bool contactExists = await context.Contacts.AnyAsync(c => c.ClientId == clientUpdate.ClientId);
+            if (!contactExists)
+                return (false, "Contact not found for this client.");
+
+            bool clientExists = await context.Clients.AnyAsync(c => c.ClientId == clientUpdate.ClientId);
             if (!clientExists)
                 return (false, "ClientId does not exist.");
+
             return (true, string.Empty);
         }
     }
