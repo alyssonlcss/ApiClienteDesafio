@@ -41,8 +41,6 @@ namespace ApiClienteDesafio.Services
                 return (false, businessError);
 
             var existing = await _context.Addresses.FirstOrDefaultAsync(a => a.ClientId == addressUpdate.ClientId);
-            if (existing == null)
-                return (false, "Address not found for this client.");
 
             var viaCepData = await _viaCepIntegration.GetAddressByCepAsync(addressUpdate.ZipCode);
             if (viaCepData == null || viaCepData.Erro == "true")

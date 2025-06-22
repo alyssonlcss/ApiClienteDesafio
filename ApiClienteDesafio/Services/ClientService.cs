@@ -46,7 +46,7 @@ namespace ApiClienteDesafio.Services
             if (!ValidationUtils.TryValidateObject(clientCreate, out var validationResults))
                 throw new ValidationException(string.Join("; ", validationResults));
             
-            var (isValid, businessError) = await ClientValidator.IsBusinessValidAsync(clientCreate, _context);
+            var (isValid, businessError) = await ClientValidator.IsBusinessValidCreateAsync(clientCreate, _context);
             if (!isValid)
                 throw new ValidationException(businessError);
 
@@ -73,8 +73,7 @@ namespace ApiClienteDesafio.Services
             
             if (clientUpdate.Contact != null)
             {
-                clientUpdate.Contact.ClientId = clientUpdate.ClientId;
-                var (isValidContact, businessErrorContact) = await ContactValidator.IsBusinessValidAsync(clientUpdate.Contact, _context);
+                var (isValidContact, businessErrorContact) = await ClientValidator.IsBusinessValidUpdateAsync(clientUpdate, _context);
                 if (!isValidContact)
                     return (false, businessErrorContact);
             }
@@ -95,6 +94,7 @@ namespace ApiClienteDesafio.Services
                 var viaCepData = await _viaCepIntegration.GetAddressByCepAsync(address.ZipCode);
                 if (viaCepData == null || viaCepData.Erro == "true")
                     return (false, "Invalid or not found ZipCode (CEP).");
+                existingClient.Address = _mapper.Map<AddressModel>(address);
                 
                 _mapper.Map(viaCepData, existingClient.Address);
             }

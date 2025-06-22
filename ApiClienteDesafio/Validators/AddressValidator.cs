@@ -17,7 +17,7 @@ namespace ApiClienteDesafio.Validators
         {
             var exists = await context.Addresses.AnyAsync(a => a.ClientId == clientId);
             if (!exists)
-                return (false, "A Client does not have an address.");
+                return (false, "A client has no address. Add one in PUT:/Clients");
             var clientExists = await context.Clients.AnyAsync(c => c.ClientId == clientId);
             if (!clientExists)
                 return (false, "ClientId does not exist.");
